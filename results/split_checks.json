@@ -1,0 +1,48 @@
+{
+  "split_counts": {
+    "train": 2053,
+    "test": 1696,
+    "validation": 985,
+    "gap": 42
+  },
+  "train_mean": {
+    "log_ret": 0.0,
+    "abs_ret": 0.0,
+    "swing_5": 0.0,
+    "swing_21": -0.0,
+    "swing_63": -0.0,
+    "ewma_swing": -0.0,
+    "ret_21": -0.0,
+    "rel_volume": 0.0,
+    "log_vix": 0.0,
+    "vix_change_21": 0.0,
+    "hl_range": -0.0
+  },
+  "train_std": {
+    "log_ret": 1.0,
+    "abs_ret": 1.0,
+    "swing_5": 1.0,
+    "swing_21": 1.0,
+    "swing_63": 1.0,
+    "ewma_swing": 1.0,
+    "ret_21": 1.0,
+    "rel_volume": 1.0,
+    "log_vix": 1.0,
+    "vix_change_21": 1.0,
+    "hl_range": 1.0
+  },
+  "max_abs_z_through_val_end": {
+    "log_ret": 13.6,
+    "abs_ret": 16.56,
+    "swing_5": 5.59,
+    "swing_21": 3.7,
+    "swing_63": 3.44,
+    "ewma_swing": 3.53,
+    "ret_21": 9.81,
+    "rel_volume": 21.01,
+    "log_vix": 3.71,
+    "vix_change_21": 5.85,
+    "hl_range": 4.92
+  },
+  "last_train_label_end": "2015-12-31"
+}
