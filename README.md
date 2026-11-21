@@ -26,12 +26,13 @@ Run from the project root, one step at a time:
 | 0 | `python -m pipeline.environment` | library versions → `results/environment.json` |
 | 1 | `python -m pipeline.download` | needs internet; refuses to run if `data/raw/funds.parquet` exists (frozen snapshot) |
 | 2a | `python -m pipeline.clean` | missing-days report; then the **team** sets `missing_days_rule` in `config.yaml` |
-| 2b | `python -m pipeline.clean` | cleaning (errors until `missing_days_rule` is set) |
+| 2b | `python -m pipeline.clean` | same command; cleans once `missing_days_rule` is set (team chose `ffill2`) |
 | 3 | `python -m pipeline.features` | |
 | 4 | `python -m pipeline.examples` | |
 | 5 | `python -m pipeline.splits` | |
 | 6 | `python -m pipeline.eda` | dates ≤ `val_end` only |
-| 7 | `python -m pipeline.baselines` | train + validation forecasts and scores |
+| 7a | `python -m pipeline.baselines` | train + validation forecasts (DCC-GARCH takes ~20 s) |
+| 7b | `python -m pipeline.metrics` | validation scores and Diebold–Mariano tests |
 | 8 | `python -m pipeline.backtest` | validation period only |
 
 Tests (no internet needed):
@@ -51,8 +52,25 @@ The test period (2020 onward) is sealed in this phase: no step reads results fro
 
 ## Result files and where they are used in Deliverable 2
 
-Filled in as each step is implemented.
+Section names are suggestions; adjust to the document's final outline.
 
 | File | Step | Used in |
 |---|---|---|
-| `results/environment.json` | 0 | Reproducibility appendix |
+| `results/environment.json` | 0 | Appendix: reproducibility |
+| `data/raw/manifest.json` (git-ignored), `results/download_checks.json` | 1 | Data: source, period, snapshot checksums |
+| `results/eda/spy_adj_close.png` | 1 | Data: visual sanity check |
+| `results/missing_days_per_fund.csv`, `results/missing_gaps.csv` | 2a | Data quality: missing days and the team's rule |
+| `results/quality_report.json`, `results/flags.csv` | 2b | Data quality: what was filled or dropped |
+| `results/extreme_moves.csv`, `results/split_suspects.csv`, `results/sanity_violations.csv` | 2b | Data quality: moves > 25 %, split checks, impossible prices |
+| `results/feature_checks.json`, `results/volume_suspects.csv` | 3 | Features: definitions, warm-up, data issues |
+| `results/example_checks.json` | 4 | Method: examples, window and label shapes |
+| `results/split_checks.json`, `results/scaler.json` | 5 | Method: splits and scaling |
+| `results/eda/summary_stats.csv` | 6 | EDA: summary table per fund |
+| `results/eda/rolling_vol.png`, `acf_spy.png` | 6 | EDA: volatility changes and clusters |
+| `results/eda/corr_heatmaps.png`, `rolling_corr_spy_tlt.png`, `eda_facts.json` | 6 | EDA: correlations change (calm vs crisis, stock–bond) |
+| `results/eda/vix_vs_future_vol.png` | 6 | EDA: VIX predicts next-month volatility |
+| `results/eda/scaled_feature_hists.png`, `scaled_feature_ranges.csv` | 6 | Features: scaled distributions |
+| `results/baseline_checks.json` | 7 | Baselines: EWMA λ choice, DCC parameters, forecast checks |
+| `results/scores.csv`, `results/dm_tests.csv` | 7 | Results: validation scores and significance |
+| `results/backtest_summary.csv`, `results/backtest_wealth.png` | 8 | Results: portfolio backtest |
+| `results/backtest_daily.csv`, `results/backtest_weights.csv` | 8 | Appendix: daily returns and weights |
