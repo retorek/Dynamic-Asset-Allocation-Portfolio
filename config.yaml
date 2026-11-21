@@ -1,0 +1,20 @@
+tickers: [SPY, IWM, QQQ, XLK, XLF, XLE, XLV, XLU, XLP, TLT, IEF, LQD, HYG, GLD, SLV, USO, DBA, VNQ, EFA, EEM]
+vix_ticker: "^VIX"
+rate_ticker: "^IRX"
+start: "2007-04-11"
+end: "2026-10-31"            # exclusive in yfinance -> last day 2026-10-30
+lookback: 63
+horizon: 21
+train_end: "2015-12-31"
+val_end: "2019-12-31"
+features: [log_ret, abs_ret, swing_5, swing_21, swing_63, ewma_swing, ret_21, rel_volume, log_vix, vix_change_21, hl_range]
+log_features: [swing_5, swing_21, swing_63, ewma_swing, hl_range]
+ewma_feature_lambda: 0.94
+ewma_baseline_lambdas: [0.94, 0.97]
+extreme_move_threshold: 0.25
+split_check_threshold: 0.05
+missing_days_rule: null       # set by the team after Step 2a: "ffill2" or "drop"
+log_floor: 1.0e-8
+trading_cost: 0.0
+dm_max_lags: 20
+seed: 42
