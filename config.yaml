@@ -13,7 +13,7 @@ ewma_feature_lambda: 0.94
 ewma_baseline_lambdas: [0.94, 0.97]
 extreme_move_threshold: 0.25
 split_check_threshold: 0.05
-missing_days_rule: null       # set by the team after Step 2a: "ffill2" or "drop"
+missing_days_rule: "ffill2"   # team decision after Step 2a (no fund gaps found; only 2 ^IRX bond holidays)
 log_floor: 1.0e-8
 trading_cost: 0.0
 dm_max_lags: 20
