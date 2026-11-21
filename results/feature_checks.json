@@ -1,0 +1,14 @@
+{
+  "shape": [
+    4859,
+    20,
+    11
+  ],
+  "first_date": "2007-07-11",
+  "last_date": "2026-10-30",
+  "nan_after_warmup": 0,
+  "inf_after_warmup": 0,
+  "vix_features_identical_across_funds": true,
+  "zero_volume_days": {},
+  "high_equals_low_days": 0
+}
