@@ -4,6 +4,7 @@ from pathlib import Path
 import yaml
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
+TRADING_DAYS_PER_YEAR = 252  # annualization convention, used by EDA and the backtest
 
 
 def load_config(path: str | Path = "config.yaml") -> dict:

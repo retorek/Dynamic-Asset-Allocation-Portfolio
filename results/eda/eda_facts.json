@@ -1,0 +1,12 @@
+{
+  "period": "2007-04-12 to 2019-12-31",
+  "avg_corr_2017": {
+    "stock_vs_stock": 0.378,
+    "stock_vs_TLT_IEF": -0.154
+  },
+  "avg_corr_crisis": {
+    "stock_vs_stock": 0.835,
+    "stock_vs_TLT_IEF": -0.395
+  },
+  "vix_vs_future_vol_corr": 0.762
+}
