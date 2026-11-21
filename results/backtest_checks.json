@@ -1,0 +1,8 @@
+{
+  "n_rebalances": 47,
+  "first_rebalance": "2016-01-04",
+  "last_rebalance": "2019-11-04",
+  "n_daily_returns": 987,
+  "weights_sum_max_error": 2.220446049250313e-16,
+  "min_weight": 0.0
+}

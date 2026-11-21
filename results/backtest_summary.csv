@@ -1,0 +1,6 @@
+portfolio,ann_vol_pct,ann_return_pct,sharpe,max_drawdown_pct,mean_turnover,largest_weight,n_days
+dcc_garch,3.0007,4.5347,1.08,-3.7943,0.2099,0.7335,987.0
+ewma,3.0382,5.2061,1.2878,-3.6655,0.2313,0.7545,987.0
+historical,3.141,5.3875,1.3033,-3.7662,0.2893,0.7599,987.0
+ledoit_wolf,3.675,6.4291,1.3969,-5.0369,0.261,0.3954,987.0
+equal_weight,8.323,9.3345,0.966,-12.7044,0.0261,0.05,987.0
