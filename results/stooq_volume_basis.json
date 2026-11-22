@@ -1,0 +1,7 @@
+{
+  "fund": "IWM",
+  "shared_days_used": 4914,
+  "excluded_flagged_days": 7,
+  "median_yahoo_over_stooq_unadjusted": 0.999999069242774,
+  "median_yahoo_over_stooq_as_is": 0.8885380143799395
+}

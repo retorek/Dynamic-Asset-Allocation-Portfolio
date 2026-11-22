@@ -26,3 +26,16 @@ def test_align_uses_previous_value_only():
     s = pd.Series([10.0, 30.0], index=[cal[0], cal[3]])
     aligned, filled = align_to_calendar(s, cal)
     assert aligned.tolist() == [10.0, 10.0, 10.0, 30.0] and len(filled) == 2
+
+
+def test_apply_corrections_replaces_and_guards_old_value():
+    import pytest
+    from pipeline.clean import apply_corrections
+    idx = pd.to_datetime(["2008-03-24", "2008-03-25"])
+    df = pd.DataFrame({("Volume", "IWM"): [90.0, 1.0]}, index=idx)
+    fix = pd.DataFrame({"fund": ["IWM"], "date": ["2008-03-25"], "field": ["Volume"], "old_value": [1], "new_value": [70]})
+    out, flags = apply_corrections(df, fix)
+    assert out.at[idx[1], ("Volume", "IWM")] == 70 and df.at[idx[1], ("Volume", "IWM")] == 1
+    assert flags["flag"].tolist() == ["corrected"]
+    with pytest.raises(ValueError):
+        apply_corrections(df, fix.assign(old_value=5))

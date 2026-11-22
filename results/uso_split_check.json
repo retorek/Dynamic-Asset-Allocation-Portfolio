@@ -1,0 +1,13 @@
+{
+  "fund": "USO",
+  "split_date": "2020-04-28",
+  "window_days": 20,
+  "before": "2020-03-30..2020-04-27",
+  "after": "2020-04-28..2020-05-26",
+  "mean_volume_before": 36807149.5,
+  "mean_volume_after": 14775237.5,
+  "after_over_before": 0.4014230305989873,
+  "close_day_before": 17.520000457763672,
+  "close_split_day": 17.040000915527344,
+  "adj_close_return_split_day_pct": -2.73972334300725
+}

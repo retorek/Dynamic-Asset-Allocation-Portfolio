@@ -65,6 +65,27 @@ def apply_missing_rule(df: pd.DataFrame, rule: str) -> tuple[pd.DataFrame, pd.Da
     return out.loc[~still_missing], pd.concat(flags, ignore_index=True)
 
 
+def apply_corrections(df: pd.DataFrame, corrections: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Replace values proven wrong by a second source; each must still match the raw value it replaces."""
+    out = df.copy()
+    for row in corrections.itertuples(index=False):
+        date, col = pd.Timestamp(row.date), (row.field, row.fund)
+        if out.at[date, col] != row.old_value:
+            raise ValueError(f"correction {row.fund} {row.field} {row.date}: raw value {out.at[date, col]} "
+                             f"!= old_value {row.old_value}")
+        out.at[date, col] = row.new_value
+    flags = pd.DataFrame({"date": pd.to_datetime(corrections["date"]), "series": corrections["fund"],
+                          "field": corrections["field"], "flag": "corrected"})
+    return out, flags
+
+
+def load_corrections() -> pd.DataFrame:
+    """Team-approved corrections (results/volume_corrections.csv); none if the file is absent."""
+    path = results_dir() / "volume_corrections.csv"
+    cols = ["fund", "date", "field", "old_value", "new_value"]
+    return pd.read_csv(path) if path.exists() else pd.DataFrame(columns=cols)
+
+
 def _long(mask: pd.DataFrame, values: pd.DataFrame, check: str) -> pd.DataFrame:
     """Turn a dates x tickers boolean mask into rows (date, ticker, check, value)."""
     s = values.where(mask).stack(future_stack=True).dropna()
@@ -191,8 +212,11 @@ def main() -> None:
     if rule is None:
         raise SystemExit("\nStep 2a done. missing_days_rule is not set in config.yaml: the team must choose "
                          f"one of {RULES} after reading the report. Step 2b (cleaning) not run.")
+    corrections = load_corrections()
+    wide, fix_flags = apply_corrections(wide, corrections)
     clean, flags = apply_missing_rule(wide, rule)
-    report = write_clean(clean, vix, irx, flags, cfg)
+    report = write_clean(clean, vix, irx, pd.concat([flags, fix_flags], ignore_index=True), cfg)
+    report["cells_corrected"] = len(corrections)
     (results_dir() / "quality_report.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
     print(json.dumps(report, indent=2))
 

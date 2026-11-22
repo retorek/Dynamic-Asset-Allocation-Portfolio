@@ -11,5 +11,6 @@
   "extreme_moves": 3,
   "split_suspects": 0,
   "missing_values_left": 0,
-  "same_dates": true
+  "same_dates": true,
+  "cells_corrected": 7
 }
