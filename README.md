@@ -97,8 +97,7 @@ Run from the project root, one step at a time:
 |---|---|---|
 | 0 | `python -m pipeline.environment` | library versions → `results/environment.json` |
 | 1 | `python -m pipeline.download` | needs internet; refuses to run if `data/raw/funds.parquet` exists (frozen snapshot) |
-| 2a | `python -m pipeline.clean` | missing-days report; then the **team** sets `missing_days_rule` in `config.yaml` |
-| 2b | `python -m pipeline.clean` | same command; cleans once `missing_days_rule` is set (team chose `ffill2`) |
+| 2 | `python -m pipeline.clean` | missing-days report, then cleaning: applies `results/volume_corrections.csv` and the team's `missing_days_rule` (`ffill2`) |
 | 3 | `python -m pipeline.features` | |
 | 4 | `python -m pipeline.examples` | |
 | 5 | `python -m pipeline.splits` | |
@@ -106,7 +105,7 @@ Run from the project root, one step at a time:
 | 7a | `python -m pipeline.baselines` | train + validation forecasts (DCC-GARCH takes ~20 s) |
 | 7b | `python -m pipeline.metrics` | validation scores and Diebold–Mariano tests |
 | 8 | `python -m pipeline.backtest` | validation period only |
-| — | `python -m pipeline.diagnostics` | report-only data checks; never changes data or `results/volume_corrections.csv` |
+| — | `python -m pipeline.diagnostics` | report-only data checks; never changes data or `results/volume_corrections.csv`. The IWM cross-check needs the Stooq file (below) |
 
 Tests (no internet needed):
 
@@ -116,9 +115,17 @@ pytest
 
 The test period (2020 onward) is sealed in this phase: no step reads results from it.
 
+**After editing `results/volume_corrections.csv`,** rerun steps 2 to 8 in order; each step reads the files
+of the step before it.
+
+**Stooq file for the diagnostics:** Stooq blocks scripted downloads, so get it by hand from
+<https://stooq.com/q/d/l/?s=iwm.us&i=d> and save it as `data/external/stooq_2026-11-22/iwm_us_d.csv`.
+Without it, the diagnostics skip the IWM cross-check; the rest of the pipeline does not need it.
+
 ## Folders
 
-- `data/` — raw snapshot, cleaned data, arrays, forecasts (git-ignored).
+- `data/` — raw snapshot (`data/raw/`, frozen), cleaned data, arrays, forecasts (git-ignored).
+- `data/external/` — second-source files downloaded by hand, one dated folder each (git-ignored).
 - `results/` — small tables and figures used in the reports (tracked); EDA in `results/eda/`.
 - `tests/` — pytest tests on small synthetic data.
 - `notebooks/` — one-off exploration only, never pipeline code.
@@ -132,12 +139,12 @@ Section names are suggestions; adjust to the document's final outline.
 | `results/environment.json` | 0 | Appendix: reproducibility |
 | `data/raw/manifest.json` (git-ignored), `results/download_checks.json` | 1 | Data: source, period, snapshot checksums |
 | `results/eda/spy_adj_close.png` | 1 | Data: visual sanity check |
-| `results/missing_days_per_fund.csv`, `results/missing_gaps.csv` | 2a | Data quality: missing days and the team's rule |
-| `results/quality_report.json`, `results/flags.csv` | 2b | Data quality: what was filled or dropped |
-| `results/extreme_moves.csv`, `results/split_suspects.csv`, `results/sanity_violations.csv` | 2b | Data quality: moves > 25 %, split checks, impossible prices |
-| `results/volume_corrections.csv` | 2b input | Data quality: hand-edited corrections applied by the cleaning step (7 IWM volumes) |
+| `results/missing_days_per_fund.csv`, `results/missing_gaps.csv` | 2 | Data quality: missing days and the team's rule |
+| `results/quality_report.json`, `results/flags.csv` | 2 | Data quality: what was filled or dropped |
+| `results/extreme_moves.csv`, `results/split_suspects.csv`, `results/sanity_violations.csv` | 2 | Data quality: moves > 25 %, split checks, impossible prices |
+| `results/volume_corrections.csv` | 2 (input) | Data quality: hand-edited corrections applied by the cleaning step (7 IWM volumes) |
 | `results/volume_check*.csv`, `stooq_volume_basis.json`, `volume_corrections_proposed.csv`, `uso_split_check.json`, `garch_variants_train.csv` | diagnostics | Data quality: volume errors, Stooq cross-check, USO split, GARCH variants |
-| `results/feature_checks.json`, `results/volume_suspects.csv` | 3 | Features: definitions, warm-up, data issues |
+| `results/feature_checks.json` | 3 | Features: definitions, warm-up, zero-volume days |
 | `results/example_checks.json` | 4 | Method: examples, window and label shapes |
 | `results/split_checks.json`, `results/scaler.json` | 5 | Method: splits and scaling |
 | `results/eda/summary_stats.csv` | 6 | EDA: summary table per fund |
