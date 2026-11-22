@@ -1,0 +1,8 @@
+fund,date,field,old_value,new_value,source,method,reason
+IWM,2008-03-25,Volume,50600,71304710,stooq 2026-11-22,round(stooq_volume * stooq_close / yahoo_raw_close),volume < 5% of prior 63-day median; Stooq shows normal volume
+IWM,2008-03-28,Volume,228800,48865411,stooq 2026-11-22,round(stooq_volume * stooq_close / yahoo_raw_close),volume < 5% of prior 63-day median; Stooq shows normal volume
+IWM,2008-04-04,Volume,159400,61538417,stooq 2026-11-22,round(stooq_volume * stooq_close / yahoo_raw_close),volume < 5% of prior 63-day median; Stooq shows normal volume
+IWM,2008-04-22,Volume,68800,81496795,stooq 2026-11-22,round(stooq_volume * stooq_close / yahoo_raw_close),volume < 5% of prior 63-day median; Stooq shows normal volume
+IWM,2008-04-24,Volume,230600,83226701,stooq 2026-11-22,round(stooq_volume * stooq_close / yahoo_raw_close),volume < 5% of prior 63-day median; Stooq shows normal volume
+IWM,2008-07-03,Volume,166200,73352803,stooq 2026-11-22,round(stooq_volume * stooq_close / yahoo_raw_close),volume < 5% of prior 63-day median; Stooq shows normal volume
+IWM,2019-07-30,Volume,1200,20742799,stooq 2026-11-22,round(stooq_volume * stooq_close / yahoo_raw_close),volume < 5% of prior 63-day median; Stooq shows normal volume

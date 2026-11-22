@@ -1,6 +1,7 @@
-"""Diagnostics only (reads data, writes results/diagnostics_*): volume errors, USO split, GARCH variants.
+"""Diagnostics only: volume errors, Stooq cross-check, USO split, GARCH variants.
 
-Nothing here changes data/raw or data/clean. Run: python -m pipeline.diagnostics
+Report-only: nothing here changes data/raw, data/clean or results/volume_corrections.csv
+(the team edits that file by hand). Run: python -m pipeline.diagnostics
 """
 import json
 from pathlib import Path
@@ -142,9 +143,10 @@ def main() -> None:
         (results_dir() / "stooq_volume_basis.json").write_text(json.dumps(basis, indent=2), encoding="utf-8")
         print(json.dumps(basis, indent=2))
         if abs(basis["median_yahoo_over_stooq_unadjusted"] - 1) < 0.01:
+            # report only: the team copies approved rows into results/volume_corrections.csv by hand
             fixes = stooq_volume_corrections(raw, STOOQ_FILE, "IWM", bad)
-            fixes.to_csv(results_dir() / "volume_corrections.csv", index=False, date_format="%Y-%m-%d")
-            print(fixes.to_string())
+            fixes.to_csv(results_dir() / "volume_corrections_proposed.csv", index=False, date_format="%Y-%m-%d")
+            print("Proposed corrections (not applied):\n" + fixes.to_string())
 
     uso = split_continuity(raw, "USO", USO_SPLIT_DATE, SPLIT_WINDOW)
     (results_dir() / "uso_split_check.json").write_text(json.dumps(uso, indent=2), encoding="utf-8")
