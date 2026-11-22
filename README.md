@@ -2,7 +2,8 @@
 
 Forecast next month's 20 × 20 covariance matrix of 20 US-listed ETFs and use it in a
 minimum-variance portfolio. This repository holds the data pipeline and the traditional
-baselines (Deliverable 2); the Transformer model is added later. Project rules: `CLAUDE.md`.
+baselines (Deliverable 2); the Transformer model is added later. Project rules and team decisions:
+`PROJECT_RULES.md`.
 All settings live in `config.yaml`.
 
 ## Install
@@ -34,6 +35,7 @@ Run from the project root, one step at a time:
 | 7a | `python -m pipeline.baselines` | train + validation forecasts (DCC-GARCH takes ~20 s) |
 | 7b | `python -m pipeline.metrics` | validation scores and Diebold–Mariano tests |
 | 8 | `python -m pipeline.backtest` | validation period only |
+| — | `python -m pipeline.diagnostics` | report-only data checks; never changes data or `results/volume_corrections.csv` |
 
 Tests (no internet needed):
 
@@ -62,6 +64,8 @@ Section names are suggestions; adjust to the document's final outline.
 | `results/missing_days_per_fund.csv`, `results/missing_gaps.csv` | 2a | Data quality: missing days and the team's rule |
 | `results/quality_report.json`, `results/flags.csv` | 2b | Data quality: what was filled or dropped |
 | `results/extreme_moves.csv`, `results/split_suspects.csv`, `results/sanity_violations.csv` | 2b | Data quality: moves > 25 %, split checks, impossible prices |
+| `results/volume_corrections.csv` | 2b input | Data quality: hand-edited corrections applied by the cleaning step (7 IWM volumes) |
+| `results/volume_check*.csv`, `stooq_volume_basis.json`, `volume_corrections_proposed.csv`, `uso_split_check.json`, `garch_variants_train.csv` | diagnostics | Data quality: volume errors, Stooq cross-check, USO split, GARCH variants |
 | `results/feature_checks.json`, `results/volume_suspects.csv` | 3 | Features: definitions, warm-up, data issues |
 | `results/example_checks.json` | 4 | Method: examples, window and label shapes |
 | `results/split_checks.json`, `results/scaler.json` | 5 | Method: splits and scaling |
