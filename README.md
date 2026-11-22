@@ -1,10 +1,81 @@
 # CS495 Portfolio Risk Forecasting
 
-Forecast next month's 20 × 20 covariance matrix of 20 US-listed ETFs and use it in a
-minimum-variance portfolio. This repository holds the data pipeline and the traditional
-baselines (Deliverable 2); the Transformer model is added later. Project rules and team decisions:
-`PROJECT_RULES.md`.
+A deep-learning course project. We forecast next month's risk table, the 20 × 20 covariance matrix of
+20 US-listed ETFs (stocks, sectors, bonds, credit, commodities, real estate, international), and use it to
+build a minimum-variance portfolio that is rebalanced every month. The forecast will come from a small
+Transformer trained from scratch; it is compared with traditional covariance forecasts.
+
+- **Data:** Yahoo Finance daily prices for SPY, IWM, QQQ, XLK, XLF, XLE, XLV, XLU, XLP, TLT, IEF, LQD, HYG,
+  GLD, SLV, USO, DBA, VNQ, EFA, EEM, plus the VIX and the 13-week T-bill rate, 2007-04-11 to 2026-10-30.
+- **Each example:** the last 63 trading days × 20 funds × 11 features, and as target the next 21 daily returns.
+- **Splits by date:** training 2007–2015, validation 2016–2019, test 2020 onward.
+
 All settings live in `config.yaml`.
+
+## Where the project stands
+
+**Deliverable 2 (pre-modeling phase) is complete:** data pipeline, data-quality checks, exploratory analysis,
+four traditional baselines, and a portfolio backtest on the validation period. **Next:** the Transformer
+model, added to this repository and compared with the baselines.
+
+The test period (2020 onward) is sealed: no result, plot or setting has been read from it yet. Two points
+are open for testing before the Transformer comparison: HYG's GARCH persistence and a Student-t or GJR
+GARCH variant. DCC-GARCH stays as it is for Deliverable 2.
+
+## Pre-modeling outcomes
+
+**Data:** 4,922 trading days for all 20 funds, with no missing fund-day, no impossible prices and no
+split problems. 4,776 examples: 2,053 training, 985 validation, 1,696 test, 42 unused at split boundaries.
+
+**What the exploratory analysis shows (2007–2019):**
+- Volatility comes in clusters: SPY's squared returns stay autocorrelated for more than 60 days.
+- Correlations jump in crises: the average stock–stock correlation is 0.38 in calm 2017 and 0.84 in
+  Sep 2008–Mar 2009, while stocks vs Treasuries go from −0.15 to −0.40.
+- The VIX on day t correlates 0.76 with SPY's realized volatility over the next 21 days.
+
+**Baseline forecasts on validation** (985 examples; lower is better):
+
+| Method | Gaussian NLL | Frobenius gap |
+|---|---|---|
+| DCC-GARCH | **13.87** | 9.50 |
+| EWMA (λ = 0.97, chosen on training) | 15.16 | **8.73** |
+| Ledoit–Wolf (63 days) | 16.82 | 9.07 |
+| Historical (63 days) | 16.95 | 9.51 |
+
+DCC-GARCH has the best NLL, and the Diebold–Mariano test finds its lead significant against every other
+method (p < 0.001). This is the score the Transformer must beat.
+
+**Monthly minimum-variance backtest on validation** (2016-01 to 2019-12, long-only, no trading cost):
+
+| Portfolio | Annual volatility | Annual return | Sharpe | Max drawdown |
+|---|---|---|---|---|
+| DCC-GARCH | **3.00 %** | 4.53 % | 1.08 | −3.79 % |
+| EWMA | 3.04 % | 5.21 % | 1.29 | −3.67 % |
+| Historical | 3.14 % | 5.39 % | 1.30 | −3.77 % |
+| Ledoit–Wolf | 3.68 % | 6.43 % | 1.40 | −5.04 % |
+| Equal weight | 8.32 % | 9.33 % | 0.97 | −12.70 % |
+
+Every forecast-based portfolio has less than half the volatility of equal weight. With no maximum weight
+yet, they hold mostly intermediate Treasuries (IEF, about 60 %) and high-yield bonds (HYG, 20–25 %).
+
+## How inconsistent data was fixed
+
+The raw download in `data/raw/` is frozen and never edited; every fix happens in the cleaning step and is
+recorded in `results/flags.csv`.
+
+| Issue found | Fix |
+|---|---|
+| **IWM volume errors:** 7 days (6 in 2008, 2019-07-30) with volume hundreds to thousands of times too low, e.g. 1,200 shares vs about 20 million. Stooq, a second source, shows normal volume on all 7. | Replaced with Stooq's volume. Stooq scales volume for dividends, so its scaling is undone: round(stooq_volume × stooq_close / yahoo_raw_close), which matches Yahoo on every other day (median ratio 1.000). The relative-volume outlier drops from 21 to 6.8 standard deviations; only IWM's relative-volume input changes. |
+| **Volume spikes** on IEF (2014), USO (2026-03) and HYG (2007-09) | Checked; real trading, kept. |
+| **Missing days:** none for the funds; 2 bond-market holidays for the T-bill rate | Previous day's rate carried forward (team rule `ffill2`). The VIX and T-bill series are aligned to the fund calendar the same way. |
+| **Daily moves above 25 %:** 3 (USO twice in 2020, SLV in 2026), all in the test period | Real market events; kept and flagged. |
+| **USO 1-for-8 reverse split** (2020-04-28) | Checked: prices and volume are both split-adjusted. No fix needed. |
+| **HYG GARCH fit at persistence 1** (shocks never fade), where the usual long-run variance formula breaks | Same forecast written in an equivalent form that stays finite; tested against the original formula. |
+
+Corrections happen **only** through `results/volume_corrections.csv`, edited by hand by the team: each row
+gives fund, date, field, old value, new value, source, method and reason, and must match the raw value it
+replaces, or cleaning stops. `python -m pipeline.diagnostics` only reports and proposes corrections
+(in `results/volume_corrections_proposed.csv`); it never changes data.
 
 ## Install
 
